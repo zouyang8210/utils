@@ -1,0 +1,52 @@
+/*搜索框1*/
+.bar1 {
+    /*background: #A3D0C3;*/
+    text-align: center;
+    margin-top: 20px;
+}
+.bar1 input {
+    /*border: 2px solid #7BA7AB;*/
+    border-radius: 9px;
+    outline: none;
+    cursor: pointer;
+    height: 35px;
+    width: 60%;
+
+}
+.bar1 button {
+    top: 0;
+    right: 0;
+    background: #7BA7AB;
+    border-radius: 0px 3px 3px 0;
+}
+.bar1 button:before {
+    content: "\f002";
+    font-family: FontAwesome;
+    font-size: 20px;
+    /*color: #F9F0DA;*/
+
+}
+
+
+.bar6 {
+    text-align: center;
+    margin-top: 20px;
+}
+.bar6 input {
+    border: 2px solid #c5464a;
+    border-radius: 5px;
+    background: transparent;
+    top: 0;
+    right: 0;
+    height: 60px;
+    width: 60%;
+    font-size: 16px;
+}
+.bar6 button {
+    background: #c5464a;
+    border-radius: 0 5px 5px 0;
+    width: 20%;
+    height: 50px;
+    top: 0;
+    right: 0;
+}

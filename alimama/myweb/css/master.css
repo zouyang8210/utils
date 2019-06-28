@@ -1,0 +1,190 @@
+
+/*滚动图片*/
+.my-sming img {
+    height: 120px;
+    width: 120px;
+}
+
+.my-sming div {
+    height: 180px;
+    text-align: center;
+}
+.commodify{
+    width: 100%;
+    display: flex;
+
+}
+/*======================================*/
+
+/*商品列表*/
+.left{
+    text-align: center;
+    /*width: 40%;*/
+    float: left;
+    /*border:1px solid green;*/
+    margin-top: 10px;
+}
+.right{
+    float: left;
+    width: 70%;
+    /*border: 1px solid blue;*/
+    margin-left: 2px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+/*商品属性*/
+.lab{
+    text-align: left;
+    width: 100%;
+    /*border: 1px solid rebeccapurple;*/
+    /*text-align: right;*/
+    /*margin-left: 1px;*/
+    margin-top: 1px;
+    font-size: 11px;
+}
+
+.lab_price{
+    text-align: left;
+    width: 100%;
+    margin-top: 5px;
+    background-color: #e4e4e4;
+    color: blue;
+    font-size: 11px;
+}
+
+.lab_coupon{
+    text-align: left;
+    width: 100%;
+    margin-top: 5px;
+    color: blue;
+    font-size: 11px;
+}
+
+.lab_couponLater{
+    text-align: left;
+    width: 100%;
+    margin-top: 5px;
+    color: red;
+    background-color: #e4e4e4;
+    font-size: 11px;
+
+}
+/*商品属性父块*/
+.detail{
+    width: 96%;
+}
+/*====================================================*/
+
+
+/*button*/
+.button {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+}
+
+.buy_button {
+    display: inline-block;
+    padding: 10px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 9px #999;
+    width: 100px;
+    height: 30px;
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+/*=============================================================*/
+
+/*复制口令弹窗框*/
+#dialog {
+    width: 80%;
+    height: 250px;
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    text-align: center;
+    /*line-height: 250px; */
+    background: #f8f8f8;
+    border:1px solid #e65c00;
+    box-shadow: 3px 3px 8px #888;
+}
+/*底部bar*/
+.bottom-tab {
+    width: 100%;
+    background-color: #e4e4e4;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    display: flex;
+    z-index: 999;
+    height: 48px;
+}
+
+.tab-item {
+    display: flex ;
+    flex :1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #666;
+    /*img: width 60px;*/
+    /*img:20px;*/
+    /*height: 20px;*/
+    /*margin-bottom: 40px*/
+}
+.bar-img{
+    width: 30px;
+}
+
+.no-show{
+    display: none;
+}
+.show{
+    display: block;
+}
+
+#top-up {
+    width:40px;
+    height:50px;
+    position:fixed;
+    right:25px;
+    bottom:75px;
+    /*display:block;*/
+    background:url(../static/img/top_bg.png) no-repeat left top;
+}
+#top-up:hover {
+    background:url(../static/img/top_bg.png) no-repeat 0 5px;
+}

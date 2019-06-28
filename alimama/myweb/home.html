@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
+    <title>省心购 省钱、开心的购物</title>
+    <meta name="keywords" content="包包,鞋子,成人,小孩,优惠券,开心,便宜,省钱,商品,宝贝"/>
+    <meta name="description" content="给你一个简单,方便,无需安装APP的,网购领取优惠券的工具。,给爱网购的人,提供一个省钱的工具"/>
+    <base target="_blank" />
+    <link href="./css/master.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <script src="./js/clipboard.min.js"></script>
+    <!--<script type="text/javascript" src="//js.users.51.la/19778503.js"></script>-->
+
+    <link rel="stylesheet" href="css/master.css">
+    <link rel="stylesheet" href="css/search.css">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/dist/jSlider.min.css">
+    <link rel="stylesheet" href="css/top_nav.css">
+</head>
+
+<body>
+
+<div id="app" >
+    <ul>
+        <li><a href="javascript:void(0)" @click="firstPage">首页</a></li>
+        <li><a class="active" href="javascript:void(0)" @click="cating(16)">女装</a></li>
+        <li><a href="javascript:void(0)" @click="cating(30)">男装</a></li>
+        <li><a href="javascript:void(0)" @click="cating(50006842)">包包</a></li>
+        <li><a href="javascript:void(0)" @click="cating(50008165,122650005)">儿童</a></li>
+        <li><a href="javascript:void(0)" @click="cating(124458005)">茶叶</a></li>
+    </ul>
+
+    <div id="comm" v-show="commShow" class="container">
+        <!--搜索栏-->
+        <div class="search bar1">
+            <input type="text" placeholder="输入想要购买的商品..." v-model="keyName">
+            <button v-on:click="search"></button>
+        </div>
+        <p style="text-align: center;color: blue;">公告:所有商品来于源淘宝、天猫,请放心选购</p>
+<!--
+        <div class="htmleaf-container" style="margin-top: 10px;">
+            <div class="top">
+                <div class="jSlider" id="slider1">
+                    <div><a href="https://www.baidu.com"><img src="https://img.alicdn.com/bao/uploaded/i3/920636035/O1CN011uS4ilQ0t6uSvdw_!!0-item_pic.jpg"></a></div>
+                    <div><img src="images/photo2.jpg"></div>
+                    <div><img src="images/photo3.jpg"></div>
+                    <div><img src="images/photo4.jpg"></div>
+                    <div><img src="images/photo5.jpg"></div>
+                    <div><img src="images/photo6.jpg"></div>
+                </div>
+            </div>
+        </div>
+-->
+        <!--//商品列表-->
+        <div style="height: 80%;">
+            <div class="commodify" v-for="site in sites">
+                <div class="left">
+                    <a  v-bind:href="'https:'+ site.url">
+                        <img v-bind:src="site.pict_url" class="img-thumbnail"   style="width: 200px;"/>
+                    </a>
+                </div>
+                <div class="right">
+                    <div class="detail" >
+                        <div class="lab"><span><b>{{ site.short_title }}</b></span></div>
+                        <div class="lab_coupon"><span>售&nbsp;&nbsp;&nbsp;&nbsp;量：{{ site.volume }}</span></div>
+                        <div class="lab_price"><span>原&nbsp;&nbsp;&nbsp;&nbsp;价：¥{{ site.zk_final_price }}元</span></div>
+                        <div class="lab_coupon"><span>优惠券：¥{{ site.couponPrice }}元</span></div>
+                        <div class="lab_couponLater"><span>券后价：¥{{ site.couponLater }}元</span></div>
+                        <div>
+                            <div style="float: left;margin-top: 5px;"><a class="button" style="background-color: violet" v-bind:href="'https:'+ site.coupon_share_url" >领券购买</a></div>
+                            <div style="float: right; margin-top: 5px;"><button  id="btn" class="button" @click="copyCommand(site.short_title,site.coupon_share_url)" >复制淘口令</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--口令复制弹窗-->
+    <div id="dialog" style="display:none">
+        <div style="background-color:orangered;text-align: right;height: 30px;font-size: 20px;"><a onclick="closeBg()">关闭</a></div>
+        <div style="margin-top: 10px;">使用说明： 复制口令后打开手机淘宝主,即可领取秘券购买！</div>
+        <div style=" margin-top: 20px;border: 1px solid #26bbdb;height: 50px;width: 80%;font-size: 20px;margin-left: 10%;"><div id="tao_cmd">{{cmd}}</div></div>
+        <div style=" margin-top: 20px;"><button id="cpy_cmd"  class="button" data-clipboard-action="copy" data-clipboard-target="#tao_cmd">{{hint}}</button></div>
+        <div style="margin-top: 10px;">注：若复制失败,手动复制口令(长按口令,全部选中,复制)</div>
+    </div>
+    <div id="buy" v-show="buyShow" class="container">
+        <!--//商品列表-->
+        <div >
+            <div class="commodify" v-for="site in sites" >
+                <div class="left">
+                    <a  v-bind:href="'https:'+ site.url">
+                        <img v-bind:src="site.pict_url" class="img-thumbnail"   style="width: 200px;"/>
+                    </a>
+                </div>
+                <div class="right">
+                    <div class="detail" >
+                        <div class="lab"><span><b>{{ site.short_title }}</b></span></div>
+                        <div class="lab_coupon"><span>售&nbsp;&nbsp;&nbsp;&nbsp;量：{{ site.volume }}</span></div>
+                        <div class="lab_price"><span>原&nbsp;&nbsp;&nbsp;&nbsp;价：¥{{ site.zk_final_price }}元</span></div>
+                        <div class="lab_coupon"><span>优惠券：¥{{ site.couponPrice }}元</span></div>
+                        <div class="lab_couponLater"><span>秒杀价：¥{{ site.couponLater }}元</span></div>
+                        <div style="text-align: center;">
+                            <!--<div style="margin-top: 5px;"><a class="buy_button" style="background-color: violet" v-bind:href="site.click_url" >去购买</a></div>-->
+                            <div style="float: left;margin-top: 5px;"><a class="button" style="background-color: violet" v-bind:href="'https:'+ site.coupon_share_url" >领券购买</a></div>
+                            <div style="float: right; margin-top: 5px;"><button   class="button" @click="copyCommand(site.short_title,site.coupon_share_url)" >复制淘口令</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="bar" >
+        <!--<img :src="'/recommend' === $route.path ? tabBarImgArr[1].selected : tabBarImgArr[1].normal">-->
+        <div class="bottom-tab" >
+            <div class="tab-item" @click="couponList">
+                <img :src="commShow?tabBarImgArr[0].selected:tabBarImgArr[0].normal" class="bar-img">
+                <span :class="">好券</span>
+            </div>
+            <div class="tab-item"  @click="buying">
+                <img :src="buyShow?tabBarImgArr[1].selected:tabBarImgArr[1].normal" class="bar-img">
+                <span >秒杀</span>
+            </div>
+        </div>
+    </div>
+    <a href="javascript:;" id="top-up" title="回到顶部" @click="topUp" v-show="topShow"></a>
+
+</div>
+<script src="./js/me.js"></script>
+<script src="css/dist/jquery.jSlider.min.js"></script>
+
+</body>
+</html>
