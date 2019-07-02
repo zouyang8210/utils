@@ -255,7 +255,8 @@ func (c *Mysql_Db) getRecordSet(rows *sql.Rows) (record RecordSet) {
 					str := fmt.Sprintf("%s", values[i])
 					tt, err := time.Parse(NORMAL_TIME_FORMAT, str)
 					if err == nil {
-						str = tt.Format(UTC_TIME_FORMAT)
+						//str = tt.Format(UTC_TIME_FORMAT)
+						str = tt.Format(NORMAL_TIME_FORMAT)
 					}
 					entry[col] = str
 

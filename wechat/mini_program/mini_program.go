@@ -81,6 +81,20 @@ func (sender *MiniProgram) SendMiniProgramMsg(moduleData interface{}) (err error
 	if err == nil {
 		json_lib.JsonToObject(string(bb), &ret)
 		if ret.ErrCode != OK {
+			err = errors.New(fmt.Sprintf("code=%d,msg=%s", ret.ErrCode, ret.ErrMsg))
+		}
+	}
+	return
+}
+
+func (sender *MiniProgram) SendMiniProgramMsg2(moduleData MiniProgramMessage) (err error) {
+	msgJson, _ := json_lib.ObjectToJson(moduleData)
+	sender.checkLogin()
+	var ret RetError
+	bb, _, err := Submit(http_lib.POST, fmt.Sprintf(SEND_MINI_MESSAGE, sender.accessToken), msgJson)
+	if err == nil {
+		json_lib.JsonToObject(string(bb), &ret)
+		if ret.ErrCode != OK {
 			err = errors.New(fmt.Sprintf("unify send message fail:code=%d,msg=%s", ret.ErrCode, ret.ErrMsg))
 		}
 	}

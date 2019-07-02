@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"io"
 	"net/url"
+	"strings"
 )
 
 /*
@@ -62,7 +63,7 @@ func Guid() (strMd5 string) {
 		str := base64.URLEncoding.EncodeToString(b)
 		h := md5.New()
 		h.Write([]byte(str))
-		strMd5 = hex.EncodeToString(h.Sum(nil))
+		strMd5 = strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
 	}
 	return
 }
