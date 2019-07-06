@@ -280,11 +280,10 @@ func (c *AliPayLib) AnalysisReturn(base RetAliPayBase) (code int, msg string) {
 			number_lib.StrToInt(base.SubCode, &code)
 			msg = base.SubMsg
 		}
-	} else {
-		if base.SubMsg != EMPTY {
-			number_lib.StrToInt(base.Code, &code)
-			msg = base.SubMsg
-		}
+	} else if base.SubMsg != EMPTY {
+		number_lib.StrToInt(base.SubCode, &code)
+		msg = base.SubMsg
+
 	}
 	return
 }

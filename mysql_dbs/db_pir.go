@@ -162,7 +162,7 @@ func (c *Mysql_Db) conditionJoint(condition Conditions) (str string) {
 	//length := len(condition.operation)
 	for n, v := range condition.conditions {
 		switch p := v.(type) {
-		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int:
+		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int, uint:
 			str += fmt.Sprintf(" %s%d ", n, p)
 		case float32, float64:
 			str += fmt.Sprintf(" %s%f ", n, p)
@@ -297,7 +297,7 @@ func (c *Control) createInsertSQL() (strSql string, err error) {
 	for n, v := range c.insertData.insertData {
 		fields += n + ","
 		switch p := v.(type) {
-		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int:
+		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int, uint:
 			values += fmt.Sprintf("%d,", p)
 		case float32, float64:
 			values += fmt.Sprintf("%f,", p)

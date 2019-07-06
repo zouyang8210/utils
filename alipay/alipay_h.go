@@ -88,12 +88,12 @@ type RetQueryTrade struct {
 //支付码交易返回
 type RetMicroPay struct {
 	RetAliPayBase
-	TradeNo       string `json:"trade_no"`       //支付宝订单号
-	OutTradeNo    string `json:"out_trade_no"`   //商户订单号
-	BuyerLogonId  string `json:"buyer_logon_id"` //买家支付定账号
-	TotalAmount   string `json:"total_amount"`   //订单交易总金额
-	ReceiptAmount string `json:"receipt_amount"` //实收金额
-	EndTime       string `json:"gmt_payment"`    //交易支付时间
+	TradeNo       string  `json:"trade_no"`       //支付宝订单号
+	OutTradeNo    string  `json:"out_trade_no"`   //商户订单号
+	BuyerLogonId  string  `json:"buyer_logon_id"` //买家支付定账号
+	TotalAmount   float32 `json:"total_amount"`   //订单交易总金额
+	ReceiptAmount string  `json:"receipt_amount"` //实收金额
+	EndTime       string  `json:"gmt_payment"`    //交易支付时间
 }
 
 //退款信息
