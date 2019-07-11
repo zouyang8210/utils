@@ -121,7 +121,7 @@ func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error)
 		case string:
 			fieldCondition += conditionJoinString(v)
 		case nil:
-			fieldCondition += fmt.Sprintf(" %s %s NULL ", v.K, v.S)
+			fieldCondition += fmt.Sprintf(" `%s` %s NULL ", v.K, v.S)
 		case time.Time:
 			v.V = time_lib.TimeToStr(p, time_lib.TIME_yyyyMMddHHmmss)
 			fieldCondition += conditionJoinString(v)
@@ -148,11 +148,11 @@ func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error)
 //数字条件连接
 func conditionJoinNumber(v KV) (str string) {
 	if v.B == "(" {
-		str += fmt.Sprintf(" %s%s %s %v ", v.B, v.K, v.S, v.V)
+		str += fmt.Sprintf(" %s`%s` %s %v ", v.B, v.K, v.S, v.V)
 	} else if v.B == ")" {
-		str += fmt.Sprintf(" %s %s %v%s ", v.K, v.S, v.V, v.B)
+		str += fmt.Sprintf(" `%s` %s %v%s ", v.K, v.S, v.V, v.B)
 	} else {
-		str += fmt.Sprintf(" %s %s %v ", v.K, v.S, v.V)
+		str += fmt.Sprintf(" `%s` %s %v ", v.K, v.S, v.V)
 	}
 	return
 }
@@ -160,11 +160,11 @@ func conditionJoinNumber(v KV) (str string) {
 //字符条件连接
 func conditionJoinString(v KV) (str string) {
 	if v.B == "(" {
-		str += fmt.Sprintf(" %s%s %s '%v' ", v.B, v.K, v.S, v.V)
+		str += fmt.Sprintf(" %s`%s` %s '%v' ", v.B, v.K, v.S, v.V)
 	} else if v.B == ")" {
-		str += fmt.Sprintf(" %s %s '%v'%s ", v.K, v.S, v.V, v.B)
+		str += fmt.Sprintf(" `%s` %s '%v'%s ", v.K, v.S, v.V, v.B)
 	} else {
-		str += fmt.Sprintf(" %s %s %v ", v.K, v.S, v.V)
+		str += fmt.Sprintf(" `%s` %s '%v' ", v.K, v.S, v.V)
 	}
 	return
 }
@@ -176,16 +176,16 @@ func (c *Db) createUpdateSql(tbName string, updateData map[string]interface{}, c
 	for n, v := range updateData {
 		switch p := v.(type) {
 		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int:
-			fieldValue += fmt.Sprintf("%s = %d,", n, p)
+			fieldValue += fmt.Sprintf("`%s` = %d,", n, p)
 		case float32, float64:
-			fieldValue += fmt.Sprintf("%s = %f,", n, p)
+			fieldValue += fmt.Sprintf("`%s` = %f,", n, p)
 		case string:
-			fieldValue += fmt.Sprintf("%s = '%s',", n, p)
+			fieldValue += fmt.Sprintf("`%s` = '%s',", n, p)
 		case nil:
-			fieldValue += fmt.Sprintf("%s = NULL,", n)
+			fieldValue += fmt.Sprintf("`%s` = NULL,", n)
 		case time.Time:
 			t := p.Format(MIL_TIME_FORMAT)
-			fieldValue += fmt.Sprintf(" %s = '%s',", n, t)
+			fieldValue += fmt.Sprintf("`%s` = '%s',", n, t)
 		}
 	}
 	fieldValue = fieldValue[0 : len(fieldValue)-1]
@@ -203,7 +203,7 @@ func (c *Db) createInsertSQL(tbName string, insertData map[string]interface{}) (
 	var fields, values string
 	//组合
 	for n, v := range insertData {
-		fields += n + ","
+		fields += fmt.Sprintf("`%s`,", n)
 		switch p := v.(type) {
 		case uint8, uint16, uint32, uint64, uint, int8, int16, int32, int64, int:
 			values += fmt.Sprintf("%d,", p)

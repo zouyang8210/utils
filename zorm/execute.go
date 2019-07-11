@@ -18,12 +18,17 @@ func New(userName, password, serverAddr, databaseName string) (db Db, err error)
 }
 
 //执行查询sql语句
-func (c *Db) Query(strSql string) (record RecordSet, err error) {
+func (c *Db) Query(strSql string, tx *Tx) (record RecordSet, err error) {
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 	defer c.printDuration(time.Now())
 	c.logs(strSql)
-	if stmt, err = c.db.Prepare(strSql); err != nil {
+	if tx == nil {
+		stmt, err = c.db.Prepare(strSql)
+	} else {
+		stmt, err = tx.tx.Prepare(strSql)
+	}
+	if err != nil {
 		return
 	}
 	defer stmt.Close()
@@ -75,6 +80,18 @@ func (c *Db) Update(tbName string, obj interface{}, cond Conditions, tx *Tx, fla
 	return
 }
 
+//更新单个字段
+func (c *Db) UpdateSingle(tbName string, field string, value interface{}, cond Conditions, tx *Tx) (result int64, err error) {
+	var obj = map[string]interface{}{
+		field: value,
+	}
+	data, err := c.createMapData(obj, true)
+	if strSql := c.createUpdateSql(tbName, data, cond); err == nil {
+		result, err = c.Execute(strSql, tx)
+	}
+	return
+}
+
 //删除记录
 func (c *Db) Delete(tbName string, cond Conditions, tx *Tx) (result int64, err error) {
 	strCond, _ := c.createCondition(cond)
@@ -84,7 +101,7 @@ func (c *Db) Delete(tbName string, cond Conditions, tx *Tx) (result int64, err e
 }
 
 //查询返回记录集
-func (c *Db) QueryRecordSet(tbName string, cond Conditions, fields ...string) (record RecordSet, err error) {
+func (c *Db) QueryRecordSet(tbName string, cond Conditions, tx *Tx, fields ...string) (record RecordSet, err error) {
 	strCond, _ := c.createCondition(cond)
 	strFields := ""
 	if len(fields) == 0 {
@@ -96,12 +113,12 @@ func (c *Db) QueryRecordSet(tbName string, cond Conditions, fields ...string) (r
 		strFields = strFields[0 : len(strFields)-1]
 	}
 	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
-	record, err = c.Query(strSql)
+	record, err = c.Query(strSql, tx)
 	return
 }
 
 //查询输出对像
-func (c *Db) QueryObject(tbName string, cond Conditions, obj interface{}, fields ...string) (err error) {
+func (c *Db) QueryObject(tbName string, cond Conditions, obj interface{}, tx *Tx, fields ...string) (err error) {
 	strCond, _ := c.createCondition(cond)
 	strFields := ""
 	if len(fields) == 0 {
@@ -114,8 +131,31 @@ func (c *Db) QueryObject(tbName string, cond Conditions, obj interface{}, fields
 	}
 	record := RecordSet{}
 	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
-	record, err = c.Query(strSql)
-	objectToObject(&obj, record.Data)
+	record, err = c.Query(strSql, tx)
+	err = objectToObject(&obj, record.Data)
+
+	return
+}
+
+//查询单条记录
+func (c *Db) QuerySingle(tbName string, cond Conditions, obj interface{}, tx *Tx, fields ...string) (err error) {
+	cond.Limit(1)
+	strCond, _ := c.createCondition(cond)
+	strFields := ""
+	if len(fields) == 0 {
+		strFields = " * "
+	} else {
+		for _, v := range fields {
+			strFields += v + ","
+		}
+		strFields = strFields[0 : len(strFields)-1]
+	}
+	record := RecordSet{}
+	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
+	record, err = c.Query(strSql, tx)
+	if record.Count > 0 {
+		err = objectToObject(&obj, record.Data[0])
+	}
 	return
 }
 
@@ -129,7 +169,7 @@ func (c *Db) QueryForProcedure(proName string, parameterValue []interface{}, out
 		strSql = fmt.Sprintf("CALL %s", proName)
 	}
 	record := RecordSet{}
-	if record, err = c.Query(strSql); err != nil {
+	if record, err = c.Query(strSql, nil); err != nil {
 		return
 	}
 	if record.Count > 0 {

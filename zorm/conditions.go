@@ -10,6 +10,12 @@ func (c *Conditions) Like(fieldName string, value interface{}) *Conditions {
 	return c
 }
 
+//
+func (c *Conditions) In(fieldName string, value interface{}) *Conditions {
+	c.conditions = append(c.conditions, KV{K: fieldName, V: value, S: " in "})
+	return c
+}
+
 //等于
 func (c *Conditions) Equal(fieldName string, value interface{}, bracket ...string) *Conditions {
 	b := ""
@@ -72,8 +78,9 @@ func (c *Conditions) Limit(value int) {
 }
 
 //分页查询
-func (c *Conditions) Page(s int, e int) {
-	c.pages = fmt.Sprintf(" LIMIT %d,%d", s, e)
+func (c *Conditions) Page(pageNo int, pageSize int) {
+	startIndex := (pageNo - 1) * pageSize
+	c.pages = fmt.Sprintf(" LIMIT %d,%d", startIndex, pageSize)
 }
 
 //设置升序排序
@@ -106,6 +113,13 @@ func (c *Conditions) ClearWhere() {
 func (c *Conditions) ClearAll() {
 	c.conditions = []KV{}
 	c.operation = []string{}
+	c.limit = EMPTY
+	c.pages = EMPTY
+	c.store = EMPTY
+}
+
+//清除where之外的所有条件
+func (c *Conditions) ClearOther() {
 	c.limit = EMPTY
 	c.pages = EMPTY
 	c.store = EMPTY
