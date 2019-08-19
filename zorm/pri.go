@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"strings"
 	"time"
-	"utils/data_conv/time_lib"
 )
 
 func (c *Db) open() (err error) {
@@ -112,8 +112,14 @@ func (c *Db) createMapData(obj interface{}, flag bool, fields ...string) (data m
 //条接拼接
 func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error) {
 	//条件组合
+	joinStr := ""
+	if len(cond.join) > 0 {
+		for _, j := range cond.join {
+			joinStr += j + " ,"
+		}
+		joinStr = joinStr[0 : len(joinStr)-1]
+	}
 	i := 0
-	//length := len(condition.operation)
 	for _, v := range cond.conditions {
 		switch p := v.V.(type) {
 		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int, uint, float32, float64:
@@ -123,7 +129,7 @@ func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error)
 		case nil:
 			fieldCondition += fmt.Sprintf(" `%s` %s NULL ", v.K, v.S)
 		case time.Time:
-			v.V = time_lib.TimeToStr(p, time_lib.TIME_yyyyMMddHHmmss)
+			v.V = p.Format(NORMAL_TIME_FORMAT)
 			fieldCondition += conditionJoinString(v)
 		}
 		if i < len(cond.conditions)-1 {
@@ -132,6 +138,9 @@ func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error)
 			break
 		}
 		i++
+	}
+	if fieldCondition != EMPTY {
+		fieldCondition = joinStr + " WHERE " + fieldCondition
 	}
 
 	if cond.store != EMPTY {
@@ -159,12 +168,21 @@ func conditionJoinNumber(v KV) (str string) {
 
 //字符条件连接
 func conditionJoinString(v KV) (str string) {
-	if v.B == "(" {
-		str += fmt.Sprintf(" %s`%s` %s '%v' ", v.B, v.K, v.S, v.V)
-	} else if v.B == ")" {
-		str += fmt.Sprintf(" `%s` %s '%v'%s ", v.K, v.S, v.V, v.B)
+	if v.S == IN {
+		str += fmt.Sprintf(" `%s` %s %v ", v.K, v.S, v.V)
 	} else {
-		str += fmt.Sprintf(" `%s` %s '%v' ", v.K, v.S, v.V)
+		vStr := fmt.Sprintf("%v", v.V)
+		if len(vStr) > 0 && vStr[0:1] == " " {
+			str += fmt.Sprintf(" `%s` %s %s ", v.K, v.S, vStr)
+		} else {
+			str += fmt.Sprintf(" `%s` %s '%s' ", v.K, v.S, vStr)
+		}
+	}
+
+	if v.B == LEFT {
+		str = v.B + str
+	} else if v.B == RIGHT {
+		str = str + v.B
 	}
 	return
 }
@@ -180,7 +198,11 @@ func (c *Db) createUpdateSql(tbName string, updateData map[string]interface{}, c
 		case float32, float64:
 			fieldValue += fmt.Sprintf("`%s` = %f,", n, p)
 		case string:
-			fieldValue += fmt.Sprintf("`%s` = '%s',", n, p)
+			if strings.ContainsAny(p, "+&^|*/") {
+				fieldValue += fmt.Sprintf("`%s` = %s,", n, p)
+			} else {
+				fieldValue += fmt.Sprintf("`%s` = '%s',", n, p)
+			}
 		case nil:
 			fieldValue += fmt.Sprintf("`%s` = NULL,", n)
 		case time.Time:
@@ -188,12 +210,14 @@ func (c *Db) createUpdateSql(tbName string, updateData map[string]interface{}, c
 			fieldValue += fmt.Sprintf("`%s` = '%s',", n, t)
 		}
 	}
-	fieldValue = fieldValue[0 : len(fieldValue)-1]
+	if len(fieldValue) > 0 {
+		fieldValue = fieldValue[0 : len(fieldValue)-1]
+	}
 	//条件组合
 	fieldCondition, _ := c.createCondition(cond)
 	sql = fmt.Sprintf("UPDATE %s SET %s ", tbName, fieldValue)
 	if fieldCondition != EMPTY {
-		sql += fmt.Sprintf(" WHERE %s", fieldCondition)
+		sql += fmt.Sprintf("  %s", fieldCondition)
 	}
 	return
 }
@@ -208,7 +232,7 @@ func (c *Db) createInsertSQL(tbName string, insertData map[string]interface{}) (
 		case uint8, uint16, uint32, uint64, uint, int8, int16, int32, int64, int:
 			values += fmt.Sprintf("%d,", p)
 		case float32, float64:
-			values += fmt.Sprintf("%2.f,", p)
+			values += fmt.Sprintf("%f,", p)
 		case string:
 			values += fmt.Sprintf("'%s',", p)
 		case time.Time:
@@ -240,6 +264,13 @@ func (c *Db) createProcedureValue(parameterValue []interface{}) (strValue string
 			}
 		}
 		strValue = strValue[0 : len(strValue)-1]
+	}
+	return
+}
+
+func handleBracket(bracket ...string) (b string) {
+	if len(bracket) > 0 {
+		b = bracket[0]
 	}
 	return
 }

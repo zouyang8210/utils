@@ -6,7 +6,6 @@ import "database/sql"
 const (
 	EMPTY        = ""
 	SPACE        = " "
-	ALL_FIELD    = "*"
 	DRIVER_MYSQL = "mysql"
 )
 
@@ -27,8 +26,14 @@ const (
 	GREATER       = " > "
 	LESS_EQUAL    = " <= "
 	GREATER_EQUAL = " >= "
-	DESC          = "DESC"
-	ASC           = "ASC"
+	DESC          = " DESC "
+	ASC           = " ASC "
+	IN            = " IN "
+	LIKE          = " LIKE "
+	IS            = " IS "
+	IS_NOT        = " IS NOT "
+	LEFT          = "("
+	RIGHT         = ")"
 )
 
 //时间格式
@@ -63,6 +68,7 @@ type Conditions struct {
 	limit      string   //查询的记录条数
 	store      string   //排序
 	pages      string   //分页
+	join       []string //
 }
 
 //where条件值

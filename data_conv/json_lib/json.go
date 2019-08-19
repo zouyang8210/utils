@@ -47,7 +47,6 @@ func JsonToObject(data string, v interface{}) (err error) {
 */
 func ObjectToObject(desc, source interface{}) (err error) {
 	json, err := ObjectToJson(source)
-	//fmt.Println(json)
 	if err == nil {
 		err = JsonToObject(json, &desc)
 	}

@@ -17,15 +17,22 @@ func New(userName, password, serverAddr, databaseName string) (db Db, err error)
 	return
 }
 
+//开户/关闭Debug模式
+func (c *Db) SetDebug(v bool) {
+	c.Debug = v
+}
+
 //执行查询sql语句
 func (c *Db) Query(strSql string, tx *Tx) (record RecordSet, err error) {
 	var stmt *sql.Stmt
 	var rows *sql.Rows
-	defer c.printDuration(time.Now())
+	//defer c.printDuration(time.Now())
 	c.logs(strSql)
 	if tx == nil {
+		defer c.printDuration(time.Now())
 		stmt, err = c.db.Prepare(strSql)
 	} else {
+		defer c.printDuration(time.Now())
 		stmt, err = tx.tx.Prepare(strSql)
 	}
 	if err != nil {
@@ -36,6 +43,7 @@ func (c *Db) Query(strSql string, tx *Tx) (record RecordSet, err error) {
 		defer rows.Close()
 		record, err = c.getRecordSet(rows)
 	}
+
 	return
 }
 
@@ -86,6 +94,7 @@ func (c *Db) UpdateSingle(tbName string, field string, value interface{}, cond C
 		field: value,
 	}
 	data, err := c.createMapData(obj, true)
+	fmt.Println(err)
 	if strSql := c.createUpdateSql(tbName, data, cond); err == nil {
 		result, err = c.Execute(strSql, tx)
 	}
@@ -112,7 +121,7 @@ func (c *Db) QueryRecordSet(tbName string, cond Conditions, tx *Tx, fields ...st
 		}
 		strFields = strFields[0 : len(strFields)-1]
 	}
-	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
+	strSql := fmt.Sprintf("SELECT %s FROM %s  %s", strFields, tbName, strCond)
 	record, err = c.Query(strSql, tx)
 	return
 }
@@ -130,10 +139,11 @@ func (c *Db) QueryObject(tbName string, cond Conditions, obj interface{}, tx *Tx
 		strFields = strFields[0 : len(strFields)-1]
 	}
 	record := RecordSet{}
-	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
+	strSql := fmt.Sprintf("SELECT %s FROM %s  %s", strFields, tbName, strCond)
 	record, err = c.Query(strSql, tx)
-	err = objectToObject(&obj, record.Data)
-
+	if record.Count > 0 {
+		err = objectToObject(&obj, record.Data)
+	}
 	return
 }
 
@@ -151,7 +161,7 @@ func (c *Db) QuerySingle(tbName string, cond Conditions, obj interface{}, tx *Tx
 		strFields = strFields[0 : len(strFields)-1]
 	}
 	record := RecordSet{}
-	strSql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", strFields, tbName, strCond)
+	strSql := fmt.Sprintf("SELECT %s FROM %s  %s", strFields, tbName, strCond)
 	record, err = c.Query(strSql, tx)
 	if record.Count > 0 {
 		err = objectToObject(&obj, record.Data[0])

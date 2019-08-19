@@ -168,6 +168,15 @@ type PaymentNotifyInfo struct {
 	TimeEnd            string `xml:"time_end" json:"time_end"`                         //支付完成时间
 	TradeStateDesc     string `xml:"trade_state_desc" json:"trade_state_desc"`
 	TradeState         string `xml:"trade_state" json:"trade_state"`
+	CouponFee0         int    `xml:"coupon_fee_0" json:"coupon_fee_0,omitempty"`
+	CouponFee1         int    `xml:"coupon_fee_1" json:"coupon_fee_1,omitempty"`
+	CouponFee2         int    `xml:"coupon_fee_2" json:"coupon_fee_2,omitempty"`
+	CouponId0          string `xml:"coupon_id_0" json:"coupon_id_0,omitempty"`
+	CouponId1          string `xml:"coupon_id_1" json:"coupon_id_1,omitempty"`
+	CouponId2          string `xml:"coupon_id_2" json:"coupon_id_2,omitempty"`
+	CouponType0        string `xml:"coupon_type_0",json:"coupon_type_0,omitempty"`
+	CouponType1        string `xml:"coupon_type_1",json:"coupon_type_1,omitempty"`
+	CouponType2        string `xml:"coupon_type_2",json:"coupon_type_2,omitempty"`
 }
 
 //退款异步通知消息
