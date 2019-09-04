@@ -104,7 +104,7 @@ func (c *Db) UpdateSingle(tbName string, field string, value interface{}, cond C
 //删除记录
 func (c *Db) Delete(tbName string, cond Conditions, tx *Tx) (result int64, err error) {
 	strCond, _ := c.createCondition(cond)
-	strSql := fmt.Sprintf("DELETE FROM %s WHERE %s", tbName, strCond)
+	strSql := fmt.Sprintf("DELETE FROM %s  %s", tbName, strCond)
 	result, err = c.Execute(strSql, tx)
 	return
 }

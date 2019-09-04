@@ -141,6 +141,8 @@ func (c *Db) createCondition(cond Conditions) (fieldCondition string, err error)
 	}
 	if fieldCondition != EMPTY {
 		fieldCondition = joinStr + " WHERE " + fieldCondition
+	} else {
+		fieldCondition = joinStr
 	}
 
 	if cond.store != EMPTY {

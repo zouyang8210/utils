@@ -12,7 +12,6 @@ import (
 var threadService tcp_service.TcpServer
 
 func threadSever() {
-
 	threadService.SetConnectCallback(connEvent) //设置连接事件回调
 	threadService.SetDataCallback(receiveData)  //设置数据接收事件回调
 	//设置数据接收协议格式

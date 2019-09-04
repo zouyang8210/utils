@@ -20,9 +20,6 @@ func (c *Conditions) In(fieldName string, value interface{}, bracket ...string) 
 //等于
 func (c *Conditions) Equal(fieldName string, value interface{}, bracket ...string) *Conditions {
 	b := handleBracket(bracket...)
-	//if len(bracket) > 0 {
-	//	b = bracket[0]
-	//}
 	c.conditions = append(c.conditions, KV{K: fieldName, V: value, S: EQUAL, B: b})
 	return c
 }
